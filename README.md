@@ -2,6 +2,24 @@ Fujitsu AirConditioner Controller for HomeKit
 ----------
 Flash to an [M5Atom](https://shop.m5stack.com/collections/atom-series/products/atom-lite-esp32-development-kit), and add your Fujitsu AirConditioner (Heatpump) to your HomeKit home. Should work with most other ESP32 kits as well.
 
+Changes in this fork (0.3)
+--------------------------
+
+Tested on a plain ESP32 DevKit (38-pin) with an MCP2021A transceiver and a Fujitsu ARYG18LLTB ducted unit.
+
+* No HomeKit notification flood: characteristics are only updated when their value actually changes
+* No slider bounce: a change made in Home.app is held until the unit confirms it on the bus (or 4 s pass)
+* Stale or late writes are dropped instead of being sent to the unit seconds later
+* Current state shows Inactive when the unit is off; Fan/Dry show Idle
+* Wi-Fi updates (HomeSpan OTA, password protected, `safeLoad`) with an automatic rollback: a new image is only marked good after 2 minutes of uptime with Wi-Fi, and 3 crash reboots in a row switch back to the previous slot
+* Web log on port 8080, behind HTTP digest auth (user `admin`, password set with the `@W <password>` serial command)
+* FujiHeatPump is vendored in `lib/` (with the fixes above) instead of pulled from git
+* Board pins for a DevKit: control button on GPIO0 (BOOT), status LED on GPIO2
+
+Wi-Fi update: set the OTA password once with the `O` serial command, set `upload_port` in `platformio.ini` to the board's IP, then run `FUJI_OTA_PWD=<password> pio run -e ota -t upload`.
+
+Do not erase the whole flash when re-flashing over USB: NVS holds the HomeKit pairing and Wi-Fi settings.
+
 Quick start
 -----------
 
